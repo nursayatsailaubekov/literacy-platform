@@ -40,7 +40,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          # Добавляем pytest-cov для отчета по покрытию
+
           pip install pytest flake8 email-validator pytest-cov 
 
       - name: Run linter (flake8)
