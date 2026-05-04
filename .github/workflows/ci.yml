@@ -8,10 +8,11 @@ on:
 
 jobs:
   test:
-    name: CI Pipeline
+    name: CI Pipeline  # Это имя появится в настройках GitHub
     runs-on: ubuntu-latest
 
     services:
+      # Если твои тесты требуют PostgreSQL, его можно добавить сюда
       postgres:
         image: postgres:15
         env:
@@ -31,18 +32,19 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/checkout@v3
         with:
           python-version: '3.10'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install email-validator pytest flake8  # Устанавливаем явно
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pytest flake8 email-validator
 
       - name: Run linter (flake8)
         run: |
+          # Остановит сборку, если есть ошибки синтаксиса
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
       - name: Run tests with pytest
