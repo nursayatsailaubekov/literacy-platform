@@ -8,11 +8,10 @@ on:
 
 jobs:
   test:
-    name: CI Pipeline  # Это имя появится в настройках GitHub
+    name: CI Pipeline
     runs-on: ubuntu-latest
 
     services:
-      # Если твои тесты требуют PostgreSQL, его можно добавить сюда
       postgres:
         image: postgres:15
         env:
