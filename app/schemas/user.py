@@ -2,6 +2,8 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from app.models.user import UserRole
+from typing import Optional
+
 
 
 class UserCreate(BaseModel):
@@ -35,3 +37,9 @@ class TokenResponse(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
     user: UserResponse
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+    is_active: Optional[bool] = None

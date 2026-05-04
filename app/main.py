@@ -2,7 +2,17 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.routes import auth, children, curriculum, learning, gamification, notifications
+from app.api.routes import (
+    auth,
+    children,
+    curriculum,
+    learning,
+    gamification,
+    notifications,
+    parents,
+    leaderboard,
+    admin,
+)
 from app.websocket.routes import router as ws_router
 
 app = FastAPI(
@@ -20,11 +30,14 @@ app.add_middleware(
 )
 
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
+app.include_router(parents.router, prefix=settings.API_V1_PREFIX)
 app.include_router(children.router, prefix=settings.API_V1_PREFIX)
 app.include_router(curriculum.router, prefix=settings.API_V1_PREFIX)
 app.include_router(learning.router, prefix=settings.API_V1_PREFIX)
 app.include_router(gamification.router, prefix=settings.API_V1_PREFIX)
 app.include_router(notifications.router, prefix=settings.API_V1_PREFIX)
+app.include_router(leaderboard.router, prefix=settings.API_V1_PREFIX)
+app.include_router(admin.router, prefix=settings.API_V1_PREFIX)
 app.include_router(ws_router)
 
 

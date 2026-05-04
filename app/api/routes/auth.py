@@ -26,3 +26,16 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
 def get_me(current_user: User = Depends(get_current_user)):
     """Get current user information."""
     return UserResponse.model_validate(current_user)
+
+
+@router.post("/logout")
+def logout(current_user: User = Depends(get_current_user)):
+    """
+    Logout user (client-side token invalidation).
+    Note: With JWT, actual logout is handled client-side by deleting the token.
+    This endpoint is provided for API consistency and can be used for logging.
+    """
+    return {
+        "message": "Successfully logged out. Please delete your token on the client side.",
+        "user_id": current_user.id
+    }
