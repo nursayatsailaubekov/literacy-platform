@@ -1,3 +1,5 @@
+[![CI Pipeline](https://github.com/nursayatsailaubekov/literacy-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/nursayatsailaubekov/literacy-platform/actions/workflows/ci.yml)
+
 # Children's Literacy Learning Platform
 
 A production-ready backend API for a Duolingo ABC-like children's literacy learning platform built with FastAPI, PostgreSQL, and SQLAlchemy.
