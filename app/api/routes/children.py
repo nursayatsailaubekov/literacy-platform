@@ -1,13 +1,37 @@
 """Child profile routes."""
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import Any
+from pydantic import BaseModel
+from datetime import datetime
 from app.db.database import get_db
 from app.schemas.child import ChildCreate, ChildUpdate, ChildResponse
+from app.schemas.learning import ExerciseResultResponse, LessonCompletionResponse
 from app.services.child_service import ChildService
+from app.repositories.learning_repository import ExerciseResultRepository, LessonCompletionRepository
+from app.repositories.gamification_repository import ChildBadgeRepository
 from app.api.dependencies import get_current_user
 from app.models.user import User
 
 router = APIRouter(prefix="/children", tags=["Children"])
+
+
+class ChildProgress(BaseModel):
+    """Schema for child's full progress."""
+    child_id: int
+    name: str
+    level: int
+    xp: int
+    streak_count: int
+    total_exercises_completed: int
+    total_lessons_completed: int
+    total_badges_earned: int
+    exercise_results: list[ExerciseResultResponse]
+    lesson_completions: list[LessonCompletionResponse]
+    accuracy_rate: float
+
+    class Config:
+        from_attributes = True
 
 
 @router.post("", response_model=ChildResponse, status_code=201)
@@ -58,3 +82,45 @@ def delete_child(
 ):
     """Delete a child profile."""
     ChildService.delete_child(db, child_id, current_user.id)
+
+
+@router.get("/{child_id}/progress", response_model=ChildProgress)
+def get_child_progress(
+    child_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Get full learning history for a child.
+    Includes all exercise results, lesson completions, and statistics.
+    """
+    # Verify ownership
+    child = ChildService.verify_child_ownership(db, child_id, current_user.id)
+
+    # Get all exercise results
+    exercise_results = ExerciseResultRepository.get_by_child(db, child_id)
+
+    # Get all lesson completions
+    lesson_completions = LessonCompletionRepository.get_by_child(db, child_id)
+
+    # Get badges count
+    badges = ChildBadgeRepository.get_by_child(db, child_id)
+
+    # Calculate accuracy rate
+    total_exercises = len(exercise_results)
+    correct_exercises = sum(1 for r in exercise_results if r.is_correct)
+    accuracy_rate = (correct_exercises / total_exercises * 100) if total_exercises > 0 else 0.0
+
+    return ChildProgress(
+        child_id=child.id,
+        name=child.name,
+        level=child.level,
+        xp=child.xp,
+        streak_count=child.streak_count,
+        total_exercises_completed=total_exercises,
+        total_lessons_completed=len(lesson_completions),
+        total_badges_earned=len(badges),
+        exercise_results=[ExerciseResultResponse.model_validate(r) for r in exercise_results],
+        lesson_completions=[LessonCompletionResponse.model_validate(c) for c in lesson_completions],
+        accuracy_rate=round(accuracy_rate, 2)
+    )
