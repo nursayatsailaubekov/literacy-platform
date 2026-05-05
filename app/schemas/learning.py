@@ -1,7 +1,7 @@
 """Learning progress schemas."""
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Any
+from typing import Any, Generic, TypeVar, List
 
 
 class ExerciseSubmission(BaseModel):
@@ -34,3 +34,13 @@ class LessonCompletionResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+T = TypeVar('T')
+
+class PaginatedResponse(BaseModel, Generic[T]):
+    items: List[T]
+    total: int
+    page: int
+    page_size: int
+    total_pages: int

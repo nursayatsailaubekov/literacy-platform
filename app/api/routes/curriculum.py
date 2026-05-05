@@ -1,7 +1,9 @@
 """Curriculum routes (admin and public)."""
-from fastapi import APIRouter, Depends
+import math
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from app.db.database import get_db
+from app.schemas.learning import PaginatedResponse
 from app.repositories.curriculum_repository import UnitRepository, LessonRepository, ExerciseRepository
 from app.schemas.curriculum import (
     UnitCreate,
@@ -13,6 +15,7 @@ from app.schemas.curriculum import (
     ExerciseCreate,
     ExerciseUpdate,
     ExerciseResponse,
+    LessonResponse
 )
 from app.api.dependencies import require_admin, get_current_user
 from app.models.user import User
@@ -82,16 +85,27 @@ def create_lesson(
     """Create a new lesson (admin only)."""
     return LessonRepository.create(db, lesson_data)
 
-
-@router.get("/units/{unit_id}/lessons", response_model=list[LessonResponse])
+@router.get("/units/{unit_id}/lessons", response_model=PaginatedResponse[LessonResponse])
 def get_lessons(
     unit_id: int,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Get all lessons for a unit."""
     published_only = current_user.role.value != "admin"
-    return LessonRepository.get_by_unit(db, unit_id, published_only=published_only)
+    
+    items, total = LessonRepository.get_by_unit_paginated(
+        db, unit_id, page, page_size, published_only
+    )
+    
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": math.ceil(total / page_size) if total > 0 else 0
+    }
 
 
 @router.get("/lessons/{lesson_id}", response_model=LessonResponse)

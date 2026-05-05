@@ -1,5 +1,6 @@
 """Curriculum repository for database operations."""
-from sqlalchemy.orm import Session
+import math
+from sqlalchemy.orm import Session, joinedload
 from typing import Optional
 from app.models.curriculum import Unit, Lesson, Exercise
 from app.schemas.curriculum import (
@@ -68,13 +69,23 @@ class LessonRepository:
 
     @staticmethod
     def get_by_id(db: Session, lesson_id: int) -> Optional[Lesson]:
-        """Get lesson by ID."""
-        return db.query(Lesson).filter(Lesson.id == lesson_id).first()
+        """Get lesson by ID with eager loading of exercises."""
+        return (
+            db.query(Lesson)
+            .options(joinedload(Lesson.exercises))
+            .filter(Lesson.id == lesson_id)
+            .first()
+        )
 
     @staticmethod
     def get_by_unit(db: Session, unit_id: int, published_only: bool = False) -> list[Lesson]:
-        """Get all lessons for a unit."""
-        query = db.query(Lesson).filter(Lesson.unit_id == unit_id).order_by(Lesson.order_index)
+        """Get all lessons for a unit with eager loading."""
+        query = (
+            db.query(Lesson)
+            .options(joinedload(Lesson.exercises))
+            .filter(Lesson.unit_id == unit_id)
+            .order_by(Lesson.order_index)
+        )
         if published_only:
             query = query.filter(Lesson.is_published == True)
         return query.all()
@@ -97,11 +108,41 @@ class LessonRepository:
     
     @staticmethod
     def get_by_order(db: Session, unit_id: int, order_index: int):
-        from app.models.curriculum import Lesson
-        return db.query(Lesson).filter(
-        Lesson.unit_id == unit_id,
-        Lesson.order_index == order_index 
-    ).first()
+        return (
+            db.query(Lesson)
+            .filter(
+                Lesson.unit_id == unit_id,
+                Lesson.order_index == order_index 
+            )
+            .first()
+        )
+    
+    @staticmethod
+    def get_by_unit_paginated(
+        db: Session, 
+        unit_id: int, 
+        page: int = 1, 
+        page_size: int = 10, 
+        published_only: bool = False
+    ) -> tuple[list[Lesson], int]:
+        """Get lessons for a unit with eager loading and pagination metadata."""
+        query = db.query(Lesson).filter(Lesson.unit_id == unit_id)
+        
+        if published_only:
+            query = query.filter(Lesson.is_published == True)
+            
+        total = query.count()
+        
+        offset = (page - 1) * page_size
+        items = (
+            query.options(joinedload(Lesson.exercises)) 
+            .order_by(Lesson.order_index)
+            .offset(offset)
+            .limit(page_size)
+            .all()
+        )
+        
+        return items, total
 
 
 class ExerciseRepository:
