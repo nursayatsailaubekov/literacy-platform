@@ -94,6 +94,13 @@ class LessonRepository:
         """Delete a lesson."""
         db.delete(lesson)
         db.commit()
+    
+    @staticmethod
+    def get_by_order(db: Session, unit_id: int, order: int):
+        return db.query(Lesson).filter(
+                Lesson.unit_id == unit_id, 
+                Lesson.order == order
+        ).first()
 
 
 class ExerciseRepository:
