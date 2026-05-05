@@ -418,6 +418,8 @@ def create_comprehensive_badges(db: Session):
 
 
 def main():
+    if db.query(Unit).count() > 0:
+        return
     """Run all seed functions."""
     print("=" * 60)
     print("SEEDING DATABASE WITH COMPREHENSIVE DATA")
