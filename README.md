@@ -1,3 +1,9 @@
+## 🚀 Deployment & API Documentation
+
+**Swagger UI (Interactive API Docs):** https://literacy-platform-backend-zapu.onrender.com/docs
+
+
+## 🛠 CI Status
 [![CI Pipeline](https://github.com/nursayatsailaubekov/literacy-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/nursayatsailaubekov/literacy-platform/actions/workflows/ci.yml)
 
 # Children's Literacy Learning Platform
