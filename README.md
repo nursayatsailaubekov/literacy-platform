@@ -2,6 +2,7 @@
 
 **Swagger UI (Interactive API Docs):** https://literacy-platform-backend-zapu.onrender.com/docs
 
+**Deployment Link:** https://literacy-platform-backend-zapu.onrender.com/ 
 
 ## 🛠 CI Status
 [![CI Pipeline](https://github.com/nursayatsailaubekov/literacy-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/nursayatsailaubekov/literacy-platform/actions/workflows/ci.yml)
