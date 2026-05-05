@@ -96,11 +96,12 @@ class LessonRepository:
         db.commit()
     
     @staticmethod
-    def get_by_order(db: Session, unit_id: int, order: int):
+    def get_by_order(db: Session, unit_id: int, order_index: int):
+        from app.models.curriculum import Lesson
         return db.query(Lesson).filter(
-                Lesson.unit_id == unit_id, 
-                Lesson.order == order
-        ).first()
+        Lesson.unit_id == unit_id,
+        Lesson.order_index == order_index 
+    ).first()
 
 
 class ExerciseRepository:

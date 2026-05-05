@@ -57,11 +57,11 @@ class LearningService:
                 detail="Lesson not found",
             )
 
-        if lesson.order > 1:
+        if lesson.order_index > 1:
             previous_lesson = LessonRepository.get_by_order(
                 db, 
                 unit_id=lesson.unit_id, 
-                order=lesson.order - 1
+                order_index=lesson.order_index - 1
             )
             if previous_lesson:
                 is_prev_completed = LessonCompletionRepository.check_completed(
@@ -70,8 +70,8 @@ class LearningService:
                 if not is_prev_completed:
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=f"Please complete Lesson {lesson.order - 1} first",
-                    )    
+                        detail=f"Please complete Lesson {lesson.order_index - 1} first",
+                    )   
 
         already_completed = LessonCompletionRepository.check_completed(db, child_id, lesson_id)
         if already_completed:
