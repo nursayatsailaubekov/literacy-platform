@@ -418,17 +418,23 @@ def create_comprehensive_badges(db: Session):
 
 
 def main():
-    if db.query(Unit).count() > 0:
-        return
-    """Run all seed functions."""
+    """Run all seed functions with duplication check."""
     print("=" * 60)
     print("SEEDING DATABASE WITH COMPREHENSIVE DATA")
     print("=" * 60)
 
     Base.metadata.create_all(bind=engine)
 
-    db = SessionLocal()
+    db = None
     try:
+        db = SessionLocal()
+        
+        if db.query(Unit).count() > 0:
+            print("🛑 Данные уже есть в базе. Пропускаю сидинг, чтобы избежать дубликатов.")
+            return
+
+        print("Запускаю процесс инициализации данных...")
+
         print("\n[1/4] Creating Users...")
         create_admin_user(db)
         create_sample_parent(db)
@@ -458,11 +464,13 @@ def main():
 
     except Exception as e:
         print(f"\n❌ Error seeding database: {e}")
-        db.rollback()
+        if db is not None:
+            db.rollback()
         import traceback
         traceback.print_exc()
     finally:
-        db.close()
+        if db is not None:
+            db.close()
 
 
 if __name__ == "__main__":
