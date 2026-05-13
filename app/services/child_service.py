@@ -17,7 +17,7 @@ class ChildService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Child age must be between 2 and 12",
             )
-
+        
         child = ChildRepository.create(db, parent_id, child_data)
         return ChildResponse.model_validate(child)
 

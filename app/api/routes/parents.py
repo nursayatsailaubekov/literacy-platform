@@ -48,9 +48,9 @@ def update_parent(
 ):
     """
     Update parent profile.
-    Parents can only update their own profile.
+    Parents can only update their own profile. Admin can update any parent.
     """
-    if current_user.id != parent_id:
+    if current_user.role.value != "admin" and current_user.id != parent_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only update your own profile"
@@ -63,14 +63,12 @@ def update_parent(
             detail="Parent not found"
         )
 
-    # Update fields
     update_dict = update_data.model_dump(exclude_unset=True)
     for field, value in update_dict.items():
         setattr(parent, field, value)
 
     db.commit()
     db.refresh(parent)
-
     return UserResponse.model_validate(parent)
 
 

@@ -9,6 +9,8 @@ from app.repositories.learning_repository import ExerciseResultRepository, Lesso
 from app.repositories.gamification_repository import ChildBadgeRepository
 from app.api.dependencies import get_current_user
 from app.models.user import User
+from fastapi import HTTPException, status
+
 
 router = APIRouter(prefix="/children", tags=["Children"])
 
@@ -19,6 +21,12 @@ def create_child(
     db: Session = Depends(get_db),
 ):
     """Create a new child profile."""
+    if current_user.role.value == "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admins are not allowed to create child profiles"
+        )
+    
     return ChildService.create_child(db, current_user.id, child_data)
 
 
