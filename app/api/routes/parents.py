@@ -8,16 +8,9 @@ from app.repositories.user_repository import UserRepository
 from app.repositories.child_repository import ChildRepository
 from app.api.dependencies import get_current_user
 from app.models.user import User
-from pydantic import BaseModel, EmailStr
-from typing import Optional
+from app.schemas.parent import UserUpdate
 
 router = APIRouter(prefix="/parents", tags=["Parents"])
-
-
-class UserUpdate(BaseModel):
-    """Schema for updating parent profile."""
-    full_name: Optional[str] = None
-    email: Optional[EmailStr] = None
 
 
 @router.get("/{parent_id}", response_model=UserResponse)

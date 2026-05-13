@@ -35,3 +35,16 @@ class ChildBadgeResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class LeaderboardEntry(BaseModel):
+    """Schema for leaderboard entry."""
+    rank: int
+    child_id: int
+    name: str
+    age: int
+    level: int
+    xp: int
+    streak_count: int
+
+    class Config:
+        from_attributes = True

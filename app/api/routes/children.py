@@ -1,11 +1,8 @@
 """Child profile routes."""
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from typing import Any
-from pydantic import BaseModel
-from datetime import datetime
 from app.db.database import get_db
-from app.schemas.child import ChildCreate, ChildUpdate, ChildResponse
+from app.schemas.child import ChildCreate, ChildUpdate, ChildResponse, ChildProgress
 from app.schemas.learning import ExerciseResultResponse, LessonCompletionResponse
 from app.services.child_service import ChildService
 from app.repositories.learning_repository import ExerciseResultRepository, LessonCompletionRepository
@@ -14,25 +11,6 @@ from app.api.dependencies import get_current_user
 from app.models.user import User
 
 router = APIRouter(prefix="/children", tags=["Children"])
-
-
-class ChildProgress(BaseModel):
-    """Schema for child's full progress."""
-    child_id: int
-    name: str
-    level: int
-    xp: int
-    streak_count: int
-    total_exercises_completed: int
-    total_lessons_completed: int
-    total_badges_earned: int
-    exercise_results: list[ExerciseResultResponse]
-    lesson_completions: list[LessonCompletionResponse]
-    accuracy_rate: float
-
-    class Config:
-        from_attributes = True
-
 
 @router.post("", response_model=ChildResponse, status_code=201)
 def create_child(

@@ -2,6 +2,7 @@
 from pydantic import BaseModel
 from datetime import datetime, date
 from typing import Optional
+from app.schemas.learning import ExerciseResultResponse, LessonCompletionResponse
 
 
 class ChildCreate(BaseModel):
@@ -30,6 +31,24 @@ class ChildResponse(BaseModel):
     streak_count: int
     last_activity_date: Optional[date]
     created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ChildProgress(BaseModel):
+    """Schema for child's full progress."""
+    child_id: int
+    name: str
+    level: int
+    xp: int
+    streak_count: int
+    total_exercises_completed: int
+    total_lessons_completed: int
+    total_badges_earned: int
+    exercise_results: list[ExerciseResultResponse]
+    lesson_completions: list[LessonCompletionResponse]
+    accuracy_rate: float
 
     class Config:
         from_attributes = True

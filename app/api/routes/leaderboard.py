@@ -3,27 +3,13 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import Optional
-from pydantic import BaseModel
 from app.db.database import get_db
 from app.models.child import Child
 from app.api.dependencies import get_current_user
 from app.models.user import User
+from app.schemas.gamification import LeaderboardEntry
 
 router = APIRouter(prefix="/leaderboard", tags=["Leaderboard"])
-
-
-class LeaderboardEntry(BaseModel):
-    """Schema for leaderboard entry."""
-    rank: int
-    child_id: int
-    name: str
-    age: int
-    level: int
-    xp: int
-    streak_count: int
-
-    class Config:
-        from_attributes = True
 
 
 @router.get("", response_model=list[LeaderboardEntry])
